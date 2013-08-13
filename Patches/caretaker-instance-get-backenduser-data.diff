@@ -1,0 +1,94 @@
+Index: classes/class.tx_caretakerinstance_Operation_GetBackendUserList.php
+===================================================================
+--- classes/class.tx_caretakerinstance_Operation_GetBackendUserList.php	(revision 0)
++++ classes/class.tx_caretakerinstance_Operation_GetBackendUserList.php	(revision 620)
+@@ -0,0 +1,77 @@
++<?php
++/***************************************************************
++ * Copyright notice
++ *
++ * (c) 2012 Christian Kuhn <lolli@schwarzbu.ch>
++ *
++ * All rights reserved
++ *
++ * This script is part of the Caretaker project. The Caretaker project
++ * is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * The GNU General Public License can be found at
++ * http://www.gnu.org/copyleft/gpl.html.
++ *
++ * This script is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * This copyright notice MUST APPEAR in all copies of the script!
++ ***************************************************************/
++
++/**
++ * An Operation that gets all backend users with all fields
++ *
++ * @author Christian Kuhn <lolli@schwarzbu.ch>
++ */
++class tx_caretakerinstance_Operation_GetBackendUserList implements tx_caretakerinstance_IOperation {
++
++	/**
++	 * Return allbackend users
++	 * No pre-condition: Return all data fields and all users, even if deleted.
++	 *
++	 * @param array $parameter
++	 * @return tx_caretakerinstance_OperationResult
++	 * @throws Exception
++	 */
++	public function execute($parameter = array()) {
++		try {
++			$result = new tx_caretakerinstance_OperationResult(TRUE, $this->getBackendUsers());
++		} catch (Exception $e) {
++			$result = new tx_caretakerinstance_OperationResult(FALSE, $e->getMessage() . ' ' . $e->getCode());
++		}
++		return $result;
++	}
++
++	/**
++	 * Query all backend users from database and return as array
++	 *
++	 * Array with backend users and their data fields
++	 */
++	protected function getBackendUsers() {
++		$rows = $this->getDatabase()->exec_SELECTgetRows(
++			'*',
++			'be_users',
++			''
++		);
++		if ($rows === NULL) {
++			throw new Exception('Query error finding be_users', 1354553226);
++		}
++		return $rows;
++	}
++
++	/**
++	 * Get typo3 database class
++	 *
++	 * @return t3lib_DB
++	 */
++	protected function getDatabase() {
++		return $GLOBALS['TYPO3_DB'];
++	}
++
++}
++?>
+Index: ext_localconf.php
+===================================================================
+--- ext_localconf.php	(revision 619)
++++ ext_localconf.php	(revision 620)
+@@ -51,6 +51,7 @@
+ 	'CheckPathExists',
+ 	'GetSvnStatus',
+ 	'RemoveDeletedBackendUser',
++	'GetBackendUserList',
+ );
+ foreach ($operations as $operationKey) {
+ 	$TYPO3_CONF_VARS['EXTCONF']['caretaker_instance']['operations'][$operationKey] =
