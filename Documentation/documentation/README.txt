@@ -1,0 +1,1 @@
+A basic documentation can be found at http://forge.typo3.org/projects/extension-caretaker_password_cracker/wiki
